@@ -4,19 +4,23 @@ require("dotenv").config();
 const todoControllers = {
     getTodos: async (req, res) => {
         let token = await req.headers.token;
-        jwt.verify(
-            token,
-            process.env.SECRET_KEY,
-            async function (err, decoded) {
-                let userId = decoded.email;
-                if (err) {
-                    res.send({ msg: "something went wrong", status: 500 });
-                } else {
-                    let data = await TodoModel.find({ userId: userId });
-                    res.send(data);
+        if (token) {
+            jwt.verify(
+                token,
+                process.env.SECRET_KEY,
+                async function (err, decoded) {
+                    let userId = decoded.email;
+                    if (err) {
+                        res.send({ msg: "something went wrong", status: 500 });
+                    } else {
+                        let data = await TodoModel.find({ userId: userId });
+                        res.send(data);
+                    }
                 }
-            }
-        );
+            );
+        } else {
+            res.send({ msg: "Access Denied" });
+        }
     },
     getOneTodo: async (req, res) => {
         let token = await req.headers.token;
@@ -72,17 +76,16 @@ const todoControllers = {
     },
     deleteTodo: async (req, res) => {
         let token = req.body.token;
-        let {id} = req.params;
+        let { id } = req.params;
         jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
             if (err) {
                 res.send(err);
             } else {
-                await TodoModel.deleteOne({ _id: id,userId:decoded.email})
-                res.send({status:200,msg:"deleted success"})
-            
+                await TodoModel.deleteOne({ _id: id, userId: decoded.email });
+                res.send({ status: 200, msg: "deleted success" });
             }
         });
     },
-}; 
+};
 
 module.exports = { todoControllers };
