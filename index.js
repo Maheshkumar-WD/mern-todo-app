@@ -9,8 +9,8 @@ require("dotenv").config();
 const app = express();
 app.use(cors())
 app.use(express.json());
-app.use("/api/todos",todoRoute);
-app.use("/api/user",userRoute)
+app.use(process.env.TODO_ROUTE,todoRoute);
+app.use(process.env.USER_ROUTE,userRoute)
 
 app.get("/",(req,res)=>{
      res.send("Welcome to the todos Server"); 
